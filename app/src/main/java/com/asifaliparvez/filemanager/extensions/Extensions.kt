@@ -1,9 +1,5 @@
 package com.asifaliparvez.filemanager.extensions
 
-import android.content.Context
-import android.graphics.drawable.Drawable
-import androidx.core.app.ActivityCompat
-import com.asifaliparvez.filemanager.R
 import java.io.File
 import kotlin.math.roundToInt
 

@@ -8,5 +8,7 @@ data class FileModel(
     val extension:String ="",
     val path:String = "",
     val isHidden:Boolean = false,
-    val length: Long
+    val length: Long,
+    val canRead:Boolean = true,
+    val canWrite:Boolean = true
         )

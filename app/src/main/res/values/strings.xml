@@ -4,4 +4,5 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="floating_button">Floating Button</string>
     <string name="folder"><![CDATA[<DIR>]]></string>
+    <string name="asking_permission_dialog_message_text">In order show and manage the files you need to provide storage permission. Please Grant access to Manage_External_Storage Permission.</string>
 </resources>

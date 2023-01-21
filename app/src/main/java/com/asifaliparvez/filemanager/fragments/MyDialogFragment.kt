@@ -8,71 +8,71 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.asifaliparvez.filemanager.R
 import com.asifaliparvez.filemanager.adapters.DialogFilesAdapter
 import com.asifaliparvez.filemanager.adapters.FilesAdapter
 import com.asifaliparvez.filemanager.databinding.FragmentDialogBinding
+import com.asifaliparvez.filemanager.dialogs.ChangeDirectoryDialog
 import com.asifaliparvez.filemanager.helpers.Files
 import com.asifaliparvez.filemanager.models.FileModel
+import java.io.File
 
 
 class MyDialogFragment : DialogFragment() {
     private var _binding:FragmentDialogBinding? = null
     private val binding get() = _binding!!
-    private lateinit var storagVolumes:ArrayList<FileModel>
-    private  var adapter: DialogFilesAdapter? = null
+    private lateinit var storageVolumes:ArrayList<FileModel>
+    private  lateinit var adapter: DialogFilesAdapter
     private var destinationPath = ""
+    private var  filesAdapter:FilesAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDialogBinding.inflate(inflater,container, false)
-        storagVolumes = Files.Companion.getExternalStorages(requireContext())
-        binding.storageTitleTextView.setOnClickListener {
-            changeStorageDialog()
-
+        storageVolumes = Files.getExternalStorages(requireContext())
+        setUpRecyclerView()
+        onClickListeners()
+        if (FilesAdapter.isCopy){
+            binding.tvStorageTitle.text = "Copy File too ->"
+        }else{
+            binding.tvStorageTitle.text = "Move File too ->"
         }
+        adapter.onClick = {path , file ->
+            destinationPath = path
+        }
+
+
         return binding.root
     }
+    private fun onClickListeners(){
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.storageTitleTextView.text = storagVolumes[0].path
-        setUpRecyclerView()
-        adapter?.onClick = {path ->
-            destinationPath = path
-            binding.storageTitleTextView.text = destinationPath
-            Toast.makeText(requireContext(), "OnCl;ickl", Toast.LENGTH_SHORT).show()
-        }
-        binding.storageTitleTextView.text = destinationPath
-        binding.okBtn.setOnClickListener {
+        binding.btnOk.setOnClickListener {
             if (FilesAdapter.isCopy){
                 copyFileListener()
             }else{
                 moveFileListener()
             }
 
-
         }
-        binding.cancelBtn.setOnClickListener {
+        binding.btnCancel.setOnClickListener {
             dialog?.dismiss()
         }
-        binding.backImageBtn.setOnClickListener {
-            val newPath = destinationPath.subSequence(0, destinationPath.lastIndexOf("/")).toString()
-            destinationPath = newPath
-            adapter!!.onDirectoryClick(destinationPath)
+        binding.imgViewChangeDir.setOnClickListener {
+            ChangeDirectoryDialog().createDialog(this, null, adapter)
         }
-    }
-    private fun changeStorageDialog(){
-        val builder = Builder(requireContext())
-        val dialogView = layoutInflater.inflate(R.layout.change_directory_alert_dialog, null)
-        builder.setView(dialogView)
-        val alertDialog = builder.create()
-        alertDialog.show()
-
+        binding.imgBtnBack.setOnClickListener {
+            val parentFile = File(destinationPath).parentFile
+            if (parentFile!= null && parentFile.canRead()){
+                destinationPath = parentFile.absolutePath
+                adapter.onDirectoryClick(Files.getFiles(requireContext(), parentFile.absolutePath))
+            }else{
+                Toast.makeText(requireContext(), "Can't go Back!!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
 
@@ -80,41 +80,41 @@ class MyDialogFragment : DialogFragment() {
             if (Files.copyFile(FilesAdapter.srcFile!!, DialogFilesAdapter.desFile)){
                 Toast.makeText(requireContext(), "File Copied Successfully ", Toast.LENGTH_SHORT).show()
                 dismiss()
-                isSuccessfull = true
+                isSuccessfully = true
             }else{
                 Toast.makeText(requireContext(), "Error! Could Not Able To Copy The File", Toast.LENGTH_LONG).show()
-                isSuccessfull = false
+                isSuccessfully = false
             }
 
 
     }
 
     private fun moveFileListener(){
-            if (Files.moveFile(FilesAdapter.srcFile!!, DialogFilesAdapter.desFile!!, FilesFragment())){
+            if (Files.moveFile(FilesAdapter.srcFile!!, DialogFilesAdapter.desFile, this)){
                 Toast.makeText(requireContext(), "File Moved Successfully ", Toast.LENGTH_SHORT).show()
                 dismiss()
-                isSuccessfull = true
+                isSuccessfully = true
             }else{
                 Toast.makeText(requireContext(), "Error! Could Not Able To Move The File", Toast.LENGTH_LONG).show()
-                isSuccessfull = false
+                isSuccessfully = false
             }
 
-
-
     }
+
+
 
 
     override fun onStart() {
         super.onStart()
-        dialog?.window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT)
+        dialog?.window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT)
     }
 
     private fun setUpRecyclerView(){
-        val adapter = DialogFilesAdapter(Files.getFiles(requireContext(),storagVolumes[0].path, isaDialog = true), this)
-        binding.listFilesRecyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.listFilesRecyclerView.adapter = adapter
+        adapter = DialogFilesAdapter(Files.getFiles(requireContext(),storageVolumes[0].path, isaDialog = true), this)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.recyclerView.adapter = adapter
     }
     companion object{
-        var isSuccessfull = false
+        var isSuccessfully = false
     }
 }

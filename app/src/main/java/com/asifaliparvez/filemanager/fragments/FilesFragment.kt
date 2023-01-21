@@ -2,7 +2,6 @@ package com.asifaliparvez.filemanager.fragments
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,14 +11,16 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.asifaliparvez.filemanager.R
 import com.asifaliparvez.filemanager.adapters.FilesAdapter
 import com.asifaliparvez.filemanager.databinding.FragmentFilesBinding
 import com.asifaliparvez.filemanager.dialogs.AskingExternalStoragePermissionDialog
+import com.asifaliparvez.filemanager.dialogs.ChangeDirectoryDialog
 import com.asifaliparvez.filemanager.dialogs.CreatingFileORFolderDialog
 import com.asifaliparvez.filemanager.helpers.Files
 import com.asifaliparvez.filemanager.helpers.Permissions
 import com.asifaliparvez.filemanager.models.FileModel
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import java.io.File
 
 class FilesFragment : Fragment() {
 
@@ -36,18 +37,14 @@ class FilesFragment : Fragment() {
         callback=
             object : OnBackPressedCallback(true /* enabled by default */) {
                 override fun handleOnBackPressed() {
-                    val storageVolumes = Files.getExternalStorages(requireContext()).filter {
-                        it.path == path
-                    }
-                    if (storageVolumes.isNotEmpty()){
-
-                        callback.isEnabled = false
-                        activity?.onBackPressed()
-
+                    val file = File(path).parentFile
+                    if (file == null || !file.canRead()){
+                        activity?.finish()
                     }else{
-                        val newPath = path.subSequence(0, path.lastIndexOf("/")).toString()
-                        path = newPath
-                        fileAdapter!!.directoryOnClick(Files.getFiles(requireContext(), newPath))
+
+                        fileAdapter!!.directoryOnClick(Files.getFiles(requireContext(), file.absolutePath))
+                        path = file.absolutePath
+
                     }
 
                 }
@@ -57,11 +54,52 @@ class FilesFragment : Fragment() {
     }
 
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentFilesBinding.inflate(inflater, container, false)
+        binding.toolbar.setOnMenuItemClickListener {
+            when(it.itemId){
+                R.id.change_Directory ->{
+                    ChangeDirectoryDialog().createDialog(this, fileAdapter, null)
+
+                }
+
+            }
+
+            true
+
+        }
+        askForPermission()
+        onClickFloatingBtn()
+
+        fileAdapter?.onItemClick = { path, position ->
+            if (position == 0) {
+                callback.handleOnBackPressed()
+
+
+            }else{
+                this.path = path
+            }
+
+        }
+        path = Files.getExternalStorages(requireContext())[0].absolutePath
+
+
+        return binding.root
+    }
+
+    private fun onClickFloatingBtn(){
+        // Handling FloatingBtn onClick
+        binding.floatingActionButton.setOnClickListener {
+            (CreatingFileORFolderDialog().createFileDialog(this, path, fileAdapter))
+
+        }
+    }
+    private fun askForPermission(){
         launcher = registerForActivityResult(ActivityResultContracts.RequestPermission()){
             if (it){
                 setUpRv()
@@ -83,30 +121,7 @@ class FilesFragment : Fragment() {
         if(Permissions.isPermissionGranted(requireContext())){
             setUpRv()
         }
-        // Handling FloatingBtn onClick
-        binding.floatingActionButton.setOnClickListener {
-            if(CreatingFileORFolderDialog().createFileDialog(this, path)){
-                Files.getFiles(requireContext(), path).forEach {
-                    Log.d("TAG", it.name)
-                }
-                Toast.makeText(requireContext(), "File Created", Toast.LENGTH_SHORT).show()
-                setUpRv(Files.getFiles(requireContext(), path))
-                fileAdapter?.notifyDataSetChanged()
-            }
 
-        }
-        fileAdapter?.onItemClick = { path, position ->
-
-            if (position == 0) {
-                callback.handleOnBackPressed()
-
-            }else{
-                this.path = path
-            }
-
-        }
-        path = Files.getExternalStorages(requireContext())[0].absolutePath
-        return binding.root
     }
     /// Setup RecyclerView
     private fun setUpRv(array:ArrayList<FileModel> = Files.getFiles(requireContext())) {

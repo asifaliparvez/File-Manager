@@ -76,6 +76,7 @@ class FilesAdapter(private var fragment: FilesFragment, var arrayList: ArrayList
             }
             if (position == 0){
                 onItemClick?.invoke(file.absolutePath, 0)
+
                 return@setOnClickListener
             }
             if (file.isDirectory){
@@ -84,6 +85,7 @@ class FilesAdapter(private var fragment: FilesFragment, var arrayList: ArrayList
 
             }else{
                 try {
+                    println(file.absolutePath)
                     val apkUri = FileProvider.getUriForFile(fragment.requireContext(), fragment.requireContext().packageName + ".providers.MyFileProvider", File(file.absolutePath))
                     val intent = Intent(Intent.ACTION_VIEW).apply {
                         setDataAndType(apkUri, null)
@@ -130,32 +132,21 @@ class FilesAdapter(private var fragment: FilesFragment, var arrayList: ArrayList
         val deleteLinerLayout = view.findViewById<LinearLayout>(R.id.llDelete)
         moveLinerLayout.setOnClickListener {
             isCopy = false
-            if (showDialogFragment()){
-                removeItemFromList(position)
+            showDialogFragment(this)
 
 
-            }else{
-                Toast.makeText(fragment.requireContext(), "Not able to move the file", Toast.LENGTH_SHORT).show()
-            }
+
+
 
         }
         copyLinerLayout.setOnClickListener {
             isCopy = true
-            showDialogFragment()
+            showDialogFragment(this)
         }
         renameLinerLayout.setOnClickListener {
             if (file.canWrite()){
-                val desPath = RenameFileDialog().renameFileDialog(fragment, file.absolutePath, file.parent!!)
-                if (desPath.isNotEmpty()){
-                    if (Files.renameFile(File(file.absolutePath), File(desPath))){
-                        Toast.makeText(fragment.requireContext(), "File Renamed Successfully ", Toast.LENGTH_SHORT).show()
-                    }else{
-                        Toast.makeText(fragment.requireContext(), "Could Not Able Rename The File", Toast.LENGTH_SHORT).show()
-                    }
-
-                }else{
-                    Toast.makeText(fragment.requireContext(), "", Toast.LENGTH_SHORT).show()
-                }
+                RenameFileDialog().renameFileDialog(fragment, file.absolutePath, file.parent!!, this, position)
+                dialog.dismiss()
 
 
             }
@@ -176,11 +167,15 @@ class FilesAdapter(private var fragment: FilesFragment, var arrayList: ArrayList
         dialog.show()
 
     }
-    private fun showDialogFragment():Boolean{
+    private fun showDialogFragment(filesAdapter: FilesAdapter):Boolean{
         val dialog = MyDialogFragment()
         dialog.show(fragment.parentFragmentManager, "Tittle")
-        return MyDialogFragment.isSuccessfull
+        return MyDialogFragment.isSuccessfully
 
+    }
+    fun insertItem(fileModel: FileModel){
+        arrayList.add(fileModel)
+        this.notifyItemInserted(arrayList.size -1)
     }
 
     private fun removeItemFromList(position:Int){

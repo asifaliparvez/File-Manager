@@ -2,6 +2,7 @@ package com.asifaliparvez.filemanager.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.asifaliparvez.filemanager.R
 import com.asifaliparvez.filemanager.databinding.ItemsBinding
@@ -11,53 +12,69 @@ import com.asifaliparvez.filemanager.helpers.Files
 import com.asifaliparvez.filemanager.helpers.Utils
 import com.asifaliparvez.filemanager.models.FileModel
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DialogFilesAdapter(var arrayList: ArrayList<FileModel>, val fragment: MyDialogFragment):RecyclerView.Adapter<DialogFilesAdapter.DialogViewHolder>() {
-    var onClick:((path:String)-> Unit)? = null
+    var onClick:((path:String, file:FileModel)-> Unit)? = null
     inner class DialogViewHolder(val binding:ItemsBinding):RecyclerView.ViewHolder(binding.root){
+        val fileNameTextView = binding.textViewFileName
+        val imageView = binding.imageView
+        val fileExtensionNameTextView = binding.fileExtensionNameTextView
+        val lastModifiedTextView = binding.lastModifiedTextView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DialogViewHolder {
-       val view = ItemsBinding.inflate(LayoutInflater.from(parent.context),parent ,false)
+        val view = ItemsBinding.inflate(LayoutInflater.from(parent.context),parent ,false)
         return DialogViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: DialogViewHolder, position: Int) {
         val file = arrayList[position]
-        onClick?.invoke(file.path)
         val tempFile = File(file.absolutePath)
+        val simpleDataFormat =  SimpleDateFormat.getDateInstance().format(Date(file.lastModified))
+        holder.lastModifiedTextView.text = simpleDataFormat
+        holder.fileNameTextView.text = file.name
+
         if (file.isDirectory){
-            holder.binding.imageView.setImageResource(R.drawable.ic_folder)
-            holder.binding.fileExtensionNameTextView.text = "<DIR>"
+            holder.imageView.setImageResource(R.drawable.ic_folder)
+            holder.fileExtensionNameTextView.text = "<DIR>"
         }else{
 
-            holder.binding.imageView.setImageDrawable(Utils.getFileDrawable(tempFile, fragment.requireContext()))
-            holder.binding.fileExtensionNameTextView.text = tempFile.checkFileSize()
+            holder.imageView.setImageDrawable(Utils.getFileDrawable(tempFile, fragment.requireContext()))
+            holder.fileExtensionNameTextView.text = tempFile.checkFileSize()
         }
 
-        holder.binding.textViewFileName.text = file.name
-        holder.binding.lastModifiedTextView.text = file.lastModified.toString()
+
 
         holder.itemView.setOnClickListener {
             if (file.isDirectory){
-                onClick?.invoke(file.path)
-                onDirectoryClick(file.path)
-                desFile = File(file.path)
 
+                if (file.canRead){
+                    onClick?.invoke(file.absolutePath, file)
+                    arrayList = Files.getFiles(fragment.requireContext(), file.absolutePath)
+                    arrayList.removeAt(0)
+                    onDirectoryClick(arrayList)
+                    desFile = File(file.path)
+                    return@setOnClickListener
+                }else{
+                    Toast.makeText(fragment.requireContext(),"Transforming file to this folder not allowed!", Toast.LENGTH_SHORT).show()
+                }
 
             }
         }
 
 
     }
-     fun onDirectoryClick(path: String){
-        arrayList = Files.getFiles(fragment.requireContext(), path, true)
+    fun onDirectoryClick(arrayList: ArrayList<FileModel>){
+        this.arrayList = arrayList
         notifyDataSetChanged()
 
 
     }
     override fun getItemCount(): Int {
-       return arrayList.size
+        return arrayList.size
     }
 
     companion object{

@@ -12,8 +12,9 @@
         android:layout_height="wrap_content"
         app:title="File Manager"
         app:titleTextColor="@color/white"
-        android:background="?attr/colorPrimary"
+        android:background="@color/primary"
         android:minHeight="?attr/actionBarSize"
+        app:menu="@menu/top_menu"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,6 +27,7 @@
         android:layout_height="0dp"
         android:contentDescription="@string/app_name"
         app:layout_constraintBottom_toBottomOf="parent"
+
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         tools:listitem="@layout/items" />

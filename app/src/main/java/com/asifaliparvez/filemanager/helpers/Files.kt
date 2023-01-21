@@ -4,21 +4,23 @@ import android.content.Context
 import android.os.Build
 import android.os.storage.StorageManager
 import android.util.Log
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.asifaliparvez.filemanager.adapters.FilesAdapter
 import com.asifaliparvez.filemanager.fragments.FilesFragment
+import com.asifaliparvez.filemanager.fragments.MyDialogFragment
 import com.asifaliparvez.filemanager.models.FileModel
 import java.io.*
 
 class Files {
     companion object{
          fun getExternalStorages(context: Context): ArrayList<FileModel> {
-            var array = arrayListOf<FileModel>()
+            val array = arrayListOf<FileModel>()
             val storageManager = context.getSystemService(StorageManager::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                var gg =  storageManager.storageVolumes
+                val gg =  storageManager.storageVolumes
                 gg.forEach {
-                    var file = it.directory!!
+                    val file = it.directory!!
                     array.add( FileModel(file.name, lastModified = file.lastModified(),
                         isDirectory = file.isDirectory, absolutePath = file.absolutePath,
                         extension = file.extension, path = file.path,
@@ -29,7 +31,7 @@ class Files {
             } else {
                 context.getExternalFilesDirs(null).forEach {file ->
 
-                    var index = file.absolutePath.indexOf("Android", ignoreCase = false)
+                    val index = file.absolutePath.indexOf("Android", ignoreCase = false)
                     val newFile = File(file.absolutePath.subSequence(0, index).toString())
                     Log.d("storagevolume", index.toString())
 
@@ -52,7 +54,7 @@ class Files {
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
 
-                val file = File(path!!)
+                val file = File(path)
                 arraysFile = file.listFiles() as Array<out File>
                 arraysFile.forEach { file ->
                     if (!file.isHidden){
@@ -65,7 +67,7 @@ class Files {
 
                 }
             }else{
-                val directory = File(path!!)
+                val directory = File(path)
                 arraysFile = directory.listFiles() as Array<out File>
                 arraysFile.forEach {file ->
                     if (file.isDirectory){
@@ -111,33 +113,44 @@ class Files {
         }
 
 
-        fun createFile(path:String, fileName:String, context: Context):Boolean{
+        fun createFile(path:String, fileName:String, context: Context):FileModel?{
             val file = File(path,fileName )
             if (file.createNewFile()){
-                return true
+                Toast.makeText(context,"File Created Successfully ", Toast.LENGTH_SHORT).show()
+                return FileModel(file.name, file.lastModified(), file.isDirectory,file.absolutePath, file.extension, file.path,
+                    file.isHidden, file.length(), file.canRead(), file.canWrite())
+            }else{
+                Toast.makeText(context,"Could not able create file! ", Toast.LENGTH_SHORT).show()
+                return null
             }
-            return false
+
         }
-        fun createFolder(path:String, folderName:String, context: Context):Boolean{
+        fun createFolder(path:String, folderName:String, context: Context):FileModel?{
             val file = File(path,folderName )
             if (file.mkdirs()){
-                return true
+                Toast.makeText(context,"Folder Created Successfully ", Toast.LENGTH_SHORT).show()
+                return FileModel(file.name, file.lastModified(), file.isDirectory,file.absolutePath, file.extension, file.path,
+                file.isHidden, file.length(), file.canRead(), file.canWrite())
+            }else{
+                Toast.makeText(context, "Could not able crete it! ", Toast.LENGTH_SHORT).show()
+
+                return null
             }
-            return false
+
         }
         fun copyFile(srcFile: File, destinationFile:File):Boolean{
             val file = File("${destinationFile.absoluteFile}/${srcFile.name}")
             srcFile.copyTo(file, true)
+
             return file.exists()
         }
-        fun moveFile(srcFile:File,  desFile:File, fragment: FilesFragment):Boolean{
+        fun moveFile(srcFile:File,  desFile:File, fragment: MyDialogFragment):Boolean{
             val file =File("${desFile.absoluteFile}/${srcFile.name}")
             srcFile.copyTo(file, true)
             if (file.exists()){
                 srcFile.delete()
-                val files = getFiles(fragment.requireContext(), desFile.absolutePath)
-                val adapter =  FilesAdapter(fragment, files, )
-                adapter.directoryOnClick(files)
+
+                Toast.makeText(fragment.requireContext(), "File Moved Successfully", Toast.LENGTH_SHORT).show()
                 return true
             }else{
                 return false
@@ -149,10 +162,21 @@ class Files {
             return  file.delete()
         }
 
-         fun renameFile(srcFile:File, desFile:File):Boolean{
-             return srcFile.renameTo(desFile)
+         fun renameFile(context: Context, srcFile:File, desFile:File):FileModel?{
+             if (srcFile.renameTo(desFile)){
+                 Toast.makeText(context, "File Renamed Successfully ", Toast.LENGTH_SHORT).show()
+                 return FileModel(desFile.name, desFile.lastModified(),
+                 desFile.isDirectory, desFile.absolutePath, desFile.extension,
+                 desFile.path, desFile.isHidden, desFile.length(),
+                 desFile.canRead(), desFile.canWrite())
+             }else{
+                 Toast.makeText(context, "Could Not Abl To Rename The File", Toast.LENGTH_SHORT).show()
+                 return null
+             }
         }
 
 
     }
+
+    // Check I
 }

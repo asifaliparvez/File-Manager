@@ -5,12 +5,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:id="@+id/imgView_Bottom_Sheet_Slide_down"
+        android:background="@drawable/bottom_sheet_slide_down_arrow"
+        android:layout_height="5dp"/>
+
     <TextView
         android:id="@+id/fileName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:fontFamily="@font/roboto_bold"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_below="@+id/imgView_Bottom_Sheet_Slide_down"
+        android:fontFamily="@font/roboto"
         android:text="Ringtones"
         android:textColor="@color/black"
         android:textSize="20sp" />
@@ -36,8 +50,10 @@
             android:id="@+id/imageViewCopy"
             android:layout_width="25dp"
             android:layout_margin="10dp"
+            android:background="@drawable/ic_content_copy_24"
             android:layout_height="25dp"
-            app:srcCompat="@drawable/ic_content_copy_24" />
+            android:backgroundTint="#747474"
+            app:tint="@color/black" />
 
         <TextView
             android:id="@+id/textViewCopy"
@@ -47,7 +63,7 @@
             android:layout_marginStart="16dp"
             android:fontFamily="@font/roboto"
             android:text="Copy"
-            android:textColor="#000000"
+            android:textColor="#747474"
             android:textSize="20sp" />
 
 
@@ -66,8 +82,9 @@
             android:id="@+id/imageViewMove"
             android:layout_width="25dp"
             android:layout_margin="10dp"
-            android:layout_height="25dp"
-            app:srcCompat="@drawable/ic_move_file_24" />
+            android:background="@drawable/ic_move_file_24"
+            android:backgroundTint="@color/natural"
+            android:layout_height="25dp" />
 
         <TextView
             android:id="@+id/textViewMove"
@@ -77,7 +94,7 @@
             android:fontFamily="@font/roboto"
             android:layout_marginStart="16dp"
             android:text="Move"
-            android:textColor="#000000"
+            android:textColor="@color/natural"
             android:textSize="20sp" />
     </LinearLayout>
 
@@ -92,8 +109,9 @@
             android:id="@+id/imageViewRename"
             android:layout_width="25dp"
             android:layout_margin="10dp"
-            android:layout_height="25dp"
-            app:srcCompat="@drawable/ic_rename_file_24" />
+            android:background="@drawable/ic_rename_file_24"
+            android:backgroundTint="@color/natural"
+            android:layout_height="25dp" />
 
         <TextView
             android:id="@+id/textViewRename"
@@ -103,7 +121,7 @@
             android:fontFamily="@font/roboto"
             android:layout_marginStart="16dp"
             android:text="Rename"
-            android:textColor="#000000"
+            android:textColor="@color/natural"
             android:textSize="20sp" />
     </LinearLayout>
 
@@ -119,7 +137,8 @@
             android:layout_width="25dp"
             android:layout_margin="10dp"
             android:layout_height="25dp"
-            app:srcCompat="@drawable/ic_delete_file_24" />
+            android:background="@drawable/ic_delete_file_24"
+            android:backgroundTint="@color/natural"/>
 
         <TextView
             android:id="@+id/textViewDelete"
@@ -128,35 +147,36 @@
             android:layout_margin="8dp"
             android:fontFamily="@font/roboto"
             android:layout_marginStart="16dp"
+
             android:text="Delete"
-            android:textColor="#000000"
+            android:textColor="@color/natural"
             android:textSize="20sp" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/llInfo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/llDelete"
-        android:orientation="horizontal">
+<!--    <LinearLayout-->
+<!--        android:id="@+id/llInfo"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@+id/llDelete"-->
+<!--        android:orientation="horizontal">-->
 
-        <ImageView
-            android:id="@+id/imageViewInfo"
-            android:layout_width="25dp"
-            android:layout_margin="10dp"
-            android:layout_height="25dp"
-            app:srcCompat="@drawable/ic_info_file_24" />
+<!--        <ImageView-->
+<!--            android:id="@+id/imageViewInfo"-->
+<!--            android:layout_width="25dp"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:layout_height="25dp"-->
+<!--            app:srcCompat="@drawable/ic_info_file_24" />-->
 
-        <TextView
-            android:id="@+id/textViewInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:fontFamily="@font/roboto"
-            android:layout_marginStart="16dp"
-            android:text="Information"
-            android:textColor="#000000"
-            android:textSize="20sp" />
-    </LinearLayout>
+<!--        <TextView-->
+<!--            android:id="@+id/textViewInfo"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_margin="8dp"-->
+<!--            android:fontFamily="@font/roboto"-->
+<!--            android:layout_marginStart="16dp"-->
+<!--            android:text="Information"-->
+<!--            android:textColor="#000000"-->
+<!--            android:textSize="20sp" />-->
+<!--    </LinearLayout>-->
 
 </RelativeLayout>

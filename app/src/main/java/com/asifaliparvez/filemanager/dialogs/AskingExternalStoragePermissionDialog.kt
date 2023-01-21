@@ -9,16 +9,15 @@ import android.net.Uri
 import android.provider.Settings
 import android.widget.Button
 import androidx.activity.result.ActivityResultLauncher
+import androidx.fragment.app.Fragment
 import com.asifaliparvez.filemanager.BuildConfig
 import com.asifaliparvez.filemanager.R
-import com.asifaliparvez.filemanager.fragments.FilesFragment
 import com.asifaliparvez.filemanager.helpers.Permissions
 
 // Asking Manage All Files Permission
 class AskingExternalStoragePermissionDialog {
 
-
-    fun createDialog(fragment: FilesFragment, launcher:ActivityResultLauncher<String>){
+    fun createDialog(fragment: Fragment, launcher:ActivityResultLauncher<String>){
         val builder = AlertDialog.Builder(fragment.requireContext())
         val dialogView = fragment.layoutInflater.inflate(R.layout.asking_manage_files_permission_dialog, null)
         builder.setView(dialogView)

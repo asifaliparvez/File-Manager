@@ -16,5 +16,5 @@ Manager all your files at one place. you can edit files, move them to another fo
 
 ## Screenshots
 
-![App Screenshot](https://raw.githubusercontent.com/asifaliparvez/File-Manager/main/Screenshots/logo.png)
+![App Screenshot](https://raw.githubusercontent.com/asifaliparvez/File-Manager/main/Screenshots/app%20screenshots.jpg)
 

@@ -4,7 +4,7 @@
 
 # File Manager
 
-Manager all your files at one place. you can edit files, move them to another folder and more. 
+Manager all your files at one place. you view all of your internal and external files, move them betweeen directories. you can delete & copy move files. you can also create new files inside of any directory. 
 
 ## Features
 - Manage all your files 
